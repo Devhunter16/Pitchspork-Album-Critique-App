@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head'); %>
+</head>
+
+<body class="container">
+
+    <main>
+        <div class="jumbotron">
+            <h2>
+                <%= record.albumName %>
+            </h2>
+            <br>
+            <div>
+                By: <%= record.artistName %>
+            </div>
+            <div>
+                Genre: <%= record.genre %>
+            </div>
+            <div>
+                Rating: <%= record.rating %>
+            </div>
+        </div>
+        <div>
+            <a href="/">Home</a>
+        </div>
+        <div>
+            <a href="/editInfo/<%= record._id %>">Edit Entry</a>
+        </div>
+        <div>
+            <form action='/collection/<%= record._id %>?_method=DELETE' method="POST">
+                <button class="btn btn-primary">Delete Entry</button>
+            </form>
+        </div>
+    </main>
+
+</body>
+
+</html>

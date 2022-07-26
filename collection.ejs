@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head'); %>
+</head>
+
+<body class="container">
+
+    <main>
+        <div class="jumbotron">
+            <div class="container">
+                <div class="row">
+                    <h1>All Albums and Ratings:</h1>
+                </div>
+                <br>
+            </div>
+            <div class="row">
+                <ul>
+                    <% for (let record of records) { %>
+                        <li>
+                            <a href="/viewInfo/<%= record._id %>">
+                                <%= record.albumName %>
+                            </a> by <%= record.artistName %> : <%= record.rating %>/10
+                        </li>
+                        <% } %>
+                </ul>
+            </div>
+        </div>
+        <div>
+            <a href="/">Home</a>
+        </div>
+        <div>
+            <a href="/updateCollection">Add entry</a>
+        </div>
+    </main>
+
+</body>
+
+</html>

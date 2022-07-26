@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head'); %>
+</head>
+
+<body class="container">
+
+    <main>
+        <div class="jumbotron">
+            <div class="container">
+                <div class="row">
+                    <h1>Records with score of 10:</h1>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <ul>
+                    <% for (let record of records) { %>
+                        <% if (record.rating===10 ) { %>
+                            <li>
+                                <a href="/viewInfo/<%= record._id %>">
+                                    <%= record.albumName %>
+                                </a> by <%= record.artistName %>
+                            </li>
+                            <% } %>
+                                <% } %>
+                </ul>
+            </div>
+        </div>
+        <div>
+            <a href="/">Home</a>
+        </div>
+    </main>
+
+</body>
+
+</html>

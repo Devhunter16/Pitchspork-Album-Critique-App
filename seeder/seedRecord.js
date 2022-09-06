@@ -19,8 +19,7 @@ mongoose.connect('mongodb://localhost:27017/AlbumInventory')
     });
 
 const seedDB = async () => {
-    // Write the logic below so it wipes before adding entries
-
+    
     // Deletes all entries in all collections every time this file is run
     await Record.deleteMany({}).then(console.log("All albums deleted."));
     await Artist.deleteMany({}).then(console.log("All artists deleted."));

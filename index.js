@@ -1,4 +1,4 @@
-// Importing and assigning express to variable "app"
+// Importing and assigning express to the variable "app"
 const express = require('express');
 const app = express();
 
@@ -7,19 +7,21 @@ const app = express();
 // support it, like in our .ejs pages.
 const methodOverride = require('method-override');
 
-// Path provides us with useful functions to interact with file paths
+// Importing path provides us with useful functions to interact with file paths
 const path = require('path');
 
 // Importing mongoose so I can use it to connect to mongodb
 const mongoose = require('mongoose');
 
-// Importing the Record model so that I can render db entries in my ejs pages
+// Importing the Record model so that I can render db entries from my Mongodb "records" 
+// collection in my ejs pages
 const Record = require('./models/recordModel');
 
-// Importing the Artist model
+// Importing the Artist model so that I can render db entries from my Mongodb "artists" 
+// collection in my ejs pages
 const Artist = require('./models/artistModel');
 
-// Connecting mongoose to our db in mongodb because we need to use our db
+// Connecting mongoose to our "AlbumInventory" db in mongodb because we need to use it
 mongoose.connect('mongodb://localhost:27017/AlbumInventory')
     .then(console.log("App connected to MongoDB"))
     .catch(error => {
@@ -35,14 +37,14 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 // We need this built-in middlewhere function in Express.
-// With it we can post nested objects with POST requests.
+// With it we can post nested objects with POST requests
 app.use(express.urlencoded({ extended: true }));
 
-// Assigning the port # to the variable: "port"
+// Assigning the port # 3000 to the variable: "port"
 const port = 3000;
 
 // Using our express middleware "method-override" that we
-// imported. The '_method' parameter lets us override 
+// imported earlier. The '_method' parameter lets us override 
 // methods with a query string like this: /?_method=DELETE. 
 // For an example check out the delete button on the 
 // vieInfo.ejs page
@@ -58,7 +60,7 @@ app.get('/', (req, res) => {
     res.render('pages/index');
 });
 
-// This renders our "Collection" page when we click the "All Album Ratings" link on the homepage
+// This renders our "Collection" page when we click the "Albums" link in the navbar
 app.get('/collection', async (req, res) => {
     // Here we find all of our albums and store them in the "records" array
     const records = await Record.find({});
@@ -67,7 +69,7 @@ app.get('/collection', async (req, res) => {
     // The "sort()" method allows us to put in a callback function
     // as a parameter. The function we created accepts two parameters,
     // "a", and "b". These will be two elements from the "records" array.
-    // The sort method will cycle through the array accapting two elements.
+    // The sort method will cycle through the array accepting two elements.
     records.sort(function (a, b) {
         // If b should come before a, returns a negative number. If a should
         // come before b, returns a positive number, if both are equal, returns
@@ -94,11 +96,10 @@ app.get('/artists', async (req, res) => {
     res.render('pages/artists', { artists })
 });
 
-// This renders our "Best Albums" page when we click the "Best Albums" link on the homepage
+// This renders our "Best Albums" page when we click the "Best Albums" link in the navbar
 app.get('/bestAlbums', async (req, res) => {
     const records = await Record.find({});
     const artists = await Artist.find({});
-    // I've already explained this part above
     records.sort(function (a, b) {
         return b.rating - a.rating;
     });
@@ -113,38 +114,39 @@ app.get('/bestAlbums', async (req, res) => {
     res.render('pages/bestAlbums', { records, artists })
 });
 
-// This renders the "Create Entry" form page when we click the "Add Entry" link on the "All Albums and Ratings" page
+// This renders the "updateCollection.ejs" form page when we click the "Add Album" link in the navbar
 app.get('/updateCollection', async (req, res) => {
     const { id } = req.params;
     const record = await Record.find(id);
     res.render('pages/updateCollection', { record })
 });
 
-// This renders our "View Album Info" page based on which album name you click on
+// This renders our "viewInfo.ejs" page based on which album name you click on
 app.get('/viewInfo/:id', async (req, res) => {
     const { id } = req.params;
     // Finding the record based on it's id
     const record = await Record.findById(id);
-    // Findong all of our artists
+    // Finding all of our artists
     const artists = await Artist.find({});
-    // Rendering our "viewInfo" page and passing our record info to it
+    // Rendering our "viewInfo" page and passing our record and artists info to it
     res.render('pages/viewInfo', { record, artists })
 });
 
-// This renders an "Edit Record Info" page based on the name of the album you clicked on
+// This renders the "editInfo.ejs" page when you click the edit button on an 
+// album's "viewInfo.ejs" page
 app.get('/editInfo/:id', async (req, res) => {
     const { id } = req.params;
     const record = await Record.findById(id);
     res.render('pages/editInfo', { record })
 });
 
-// This renders an "Show Artist Info" page based on the name of the artist you clicked on
+// This renders rgw "showArtist" page based on the name of the artist you clicked on
 app.get('/showArtist/:id', async (req, res) => {
     const { id } = req.params;
     // Here we're populating the albums array for the artist because
     // until we do that it is just an array of album ids. Once we 
     // pupulate it we can use all of the album information for each 
-    // album
+    // album in our ejs page
     const artist = await Artist.findById(id).populate('albums');
     const records = await Record.find({});
     // Sorting the artist's albums alphabetically
@@ -152,18 +154,19 @@ app.get('/showArtist/:id', async (req, res) => {
     res.render('pages/showArtist', { artist, records })
 });
 
+// PUT request to update an album's info
 app.put('/collection/:id', async (req, res) => {
     const { id } = req.params;
     // Finds the record by it's ID and updates it's info
     await Record.findByIdAndUpdate(id, req.body, { runValidators: true, new: true });
-    // Brings us back to the "All Album Ratings" page
+    // Brings us back to the "collection.ejs" page
     res.redirect('/collection');
 });
 
 // This posts all of the info you input into the form on the "updateCollection.ejs" 
 // page and then dumps you out at the "collection.ejs" page
 app.post('/collection', async (req, res) => {
-    // req.body are allof  the keys and values you just submitted in the form
+    // req.body are all of the keys and values you just submitted in the form
     const newRecord = new Record(req.body);
     await newRecord.save();
     // Boolean value we need for the if, then logic below
@@ -184,7 +187,7 @@ app.post('/collection', async (req, res) => {
         }
     };
     // If the for loop above didn't find a match, this creates a new
-    // artist and adds the ablum to that artist's array or albums
+    // artist and adds the album to that artist's array of albums
     if (foundArtist == false) {
         // Creating a new artist based on what the user entered in the
         // artistName field on the form
@@ -201,25 +204,26 @@ app.post('/collection', async (req, res) => {
     res.redirect('collection/');
 });
 
+// DELETE request to delete an artist and all of their albums
 app.delete('/artists/:id', async (req, res) => {
     const { id } = req.params;
-    // Here we await the deletion of the record and then log the deleted record in the console
     const artist = await Artist.findById(id);
     // Here we are checking whether or not the artist has any albums in
-    // the arists's "albums" array, and if so we delete them all
+    // the artist's "albums" array, and if so we delete them all
     if (artist.albums.length) {
         const res = await Record.deleteMany({ _id: { $in: artist.albums } });
         console.log(res);
     }
     // Now we're deleting the artist
     await Artist.findByIdAndDelete(id);
-    // Now we redirect to the "All Albums and Ratings" page
+    // Now we redirect to the "artists.ejs" page
     res.redirect('/artists');
 });
 
+// DELETE request for a single album
 app.delete('/collection/:id', async (req, res) => {
     const { id } = req.params;
-    // Here we await the deletion of the record and then log the deleted record in the console
+    // Here we await the deletion of the record
     const deletedRecord = await Record.findByIdAndDelete(id);
     const artists = await Artist.find({});
     // This for loop goes through the "artists" array and removes the
@@ -230,10 +234,6 @@ app.delete('/collection/:id', async (req, res) => {
             await artists[i].save();
         }
     };
-
     // Now we redirect to the "All Albums and Ratings" page
     res.redirect('/collection');
 });
-
-// lastFM API key 6759f7a3d41ce0704cc47402e3b25b41
-// lastFM shared secret 7f66376d8c2f54805911ce097f3ec61e

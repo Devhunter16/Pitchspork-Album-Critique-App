@@ -1,5 +1,5 @@
 # Pitchspork-Album-Rating-Express-App
-Pitchspork album rating express app created using Node.JS, Express.JS, EJS, MongoDB, Mongoose, and Bootstrap.
+Pitchspork album rating express app created using HTML, CSS, Javascript, Node.JS, Express.JS, EJS, MongoDB, Mongoose, and Bootstrap.
 
 Functionality to be implemented:
 

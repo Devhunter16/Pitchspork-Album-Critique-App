@@ -1,0 +1,55 @@
+<!-- This is not done yet, still trying to find a way to populate 
+this with all of an artist's albums -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('../partials/head'); %>
+</head>
+
+<body class="container">
+
+    <main>
+        <div class="jumbotron bg-image"
+            style="background-image: url('https://images.unsplash.com/photo-1528731708534-816fe59f90cb?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80'); height: 750px;">
+            <header>
+                <%- include('../partials/header'); %>
+            </header>
+            <div class="container">
+                <div class="row">
+                    <h1 style="color: #656965" class="ml-4 mb-3">
+                        <%= artist.name %>
+                    </h1>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <h2 style="color: #86636B" class="ml-4 mb-3">
+                        Albums
+                    </h2>
+                </div>
+            </div>
+            <div class="container ml-4" style="color: #86636B">
+                <div class="row mb-3">
+                    <ul>
+                        <% for (let i=0; i < artist.albums.length; i++ ) { %>
+                        <li>
+                            <a style="color: #86636B"
+                                href="/viewInfo/artists.albums[i].id"><%= artist.albums[i].albumName %></a>
+                        </li>
+                        <% } %>
+                    </ul>
+                </div>
+                <div class="row mb-3">
+                    <form action='/artists/<%= artist._id %>?_method=DELETE' method="POST">
+                        <button class="btn btn-outline-danger">Delete Artist</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
+
+</html>

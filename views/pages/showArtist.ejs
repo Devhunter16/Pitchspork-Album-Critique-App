@@ -1,6 +1,3 @@
-<!-- This is not done yet, still trying to find a way to populate 
-this with all of an artist's albums -->
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -34,10 +31,14 @@ this with all of an artist's albums -->
                 <div class="row mb-3">
                     <ul>
                         <% for (let i=0; i < artist.albums.length; i++ ) { %>
+                        <% for (let j=0; j < records.length; j++ ) { %>
+                        <% if (records[j].albumName === artist.albums[i].albumName) { %>
                         <li>
                             <a style="color: #86636B"
-                                href="/viewInfo/artists.albums[i].id"><%= artist.albums[i].albumName %></a>
+                                href="/viewInfo/<%= records[j]._id %>"><%= artist.albums[i].albumName %></a>
                         </li>
+                        <% } %>
+                        <% } %>
                         <% } %>
                     </ul>
                 </div>

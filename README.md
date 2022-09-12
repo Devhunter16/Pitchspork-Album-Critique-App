@@ -8,3 +8,7 @@ Functionality to be implemented:
 - User authentication
 - Editing code comments to make more sense to anyone reading the code
 - Editing names of files to be more descriptive
+
+Other future implementations:
+
+- Re-do layout 

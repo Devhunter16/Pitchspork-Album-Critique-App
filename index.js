@@ -19,14 +19,6 @@ const path = require('path');
 // Importing mongoose so I can use it to connect to mongodb
 const mongoose = require('mongoose');
 
-// Importing the Record model so that I can render db entries from my Mongodb "records" 
-// collection in my ejs pages
-const Record = require('./models/recordModel');
-
-// Importing the Artist model so that I can render db entries from my Mongodb "artists" 
-// collection in my ejs pages
-const Artist = require('./models/artistModel');
-
 // Connecting mongoose to our "AlbumInventory" db in mongodb because we need to use it
 mongoose.connect('mongodb://localhost:27017/AlbumInventory')
     .then(console.log("App connected to MongoDB"))

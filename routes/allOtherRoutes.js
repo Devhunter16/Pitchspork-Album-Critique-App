@@ -1,6 +1,6 @@
 // This file is not completely necessary in order for our app to function,
-// but it is nice to keep routes in files like this for organizational
-// purposes
+// (it could easily all be in the index.js file) but it is nice to keep 
+// routes in files like this for organizational purposes
 
 const express = require('express');
 const router = express.Router();

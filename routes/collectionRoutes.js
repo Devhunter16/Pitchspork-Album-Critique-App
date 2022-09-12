@@ -13,6 +13,33 @@ const Record = require('../models/recordModel');
 // collection in my ejs pages
 const Artist = require('../models/artistModel');
 
+// Importing the ExpressError class we created in the utilities
+// folder so that we can use it in the code on this page
+const ExpressError = require('../utilities/ExpressError');
+
+// Creating a middleware function that contains server-side validation
+// logic to make sure than no user can submit an empty form. 
+const validateAlbumInput = (req, res, next) => {
+    // If the input in the form is valid, then the error will be 
+    // undefined. If the input is invalid, error is assigned a 
+    // ValidationError object providing more information
+    const { error } = recordSchema.validate(req.body);
+    // If an error exists, we map over error.details which is an 
+    // array of ValidationError objects, take every object and return
+    // the error messages into a new array, then join those elements 
+    // of the new array we created by comma into a new string. We 
+    // save that string as the variable msg so we can display it to
+    // the user by adding it as an argument to our ExpressError class
+    if (error) {
+        const msg = error.details.map(element => element.message).join(",");
+        throw new ExpressError(msg, 400);
+    } else {
+        // We have to call next here so if there is no error we can
+        // move past this rather than getting stuck here
+        next();
+    }
+};
+
 // This renders our "collection.ejs" page when we click the "Albums" link in the navbar
 router.get('/', async (req, res) => {
     // Here we find all of our albums and store them in the "records" array
@@ -40,8 +67,13 @@ router.get('/', async (req, res) => {
     res.render('pages/collection', { records, artists })
 });
 
-// PUT request to update an album's info
-router.put('/:id', async (req, res) => {
+// PUT request to update an album's info. We are including the middleware
+// function validateAlbumInput() as an argument in order to use it in this
+// route handler so that we have server-side validation in case a user 
+// somehow makes it past our bootstrap client-side validation. We don't need to call
+// it within the route handler, we can just add is as an argument
+// and it'll work
+router.put('/:id', validateAlbumInput, async (req, res) => {
     const { id } = req.params;
     // Finds the record by it's ID and updates it's info
     await Record.findByIdAndUpdate(id, req.body, { runValidators: true, new: true });
@@ -51,7 +83,7 @@ router.put('/:id', async (req, res) => {
 
 // This posts all of the info you input into the form on the "updateCollection.ejs" 
 // page and then dumps you out at the "collection.ejs" page
-router.post('/', async (req, res) => {
+router.post('/', validateAlbumInput, async (req, res) => {
     // req.body are all of the keys and values you just submitted in the form
     const newRecord = new Record(req.body);
     await newRecord.save();

@@ -2,6 +2,12 @@
 const express = require('express');
 const app = express();
 
+// Importing all of our routing from our routing js files
+const collectionRoutes = require('./routes/collectionRoutes');
+const artistRoutes = require('./routes/artistRoutes');
+const allOtherRoutes = require('./routes/allOtherRoutes');
+
+
 // Importing method-override middleware to use "PUT" or 
 // "DELETE" requests in places where the client doesn't 
 // support it, like in our .ejs pages.
@@ -50,190 +56,17 @@ const port = 3000;
 // vieInfo.ejs page
 app.use(methodOverride('_method'));
 
+// This tells our app to use the routes in our routing js files,
+// we've already required these routes but requiring them is not
+// enough. Requiring these routes basically makes it so we don't
+// have to write /collection/whatever in our routes any more and 
+// instead can omit the /collection part. It is also good to keep
+// routes in seperate files if poossible for organizational purposes.
+app.use('/collection', collectionRoutes);
+app.use('/artists', artistRoutes);
+app.use('/', allOtherRoutes);
+
 // Confirms listening when the app is running in node.js 
 app.listen(port, () => {
     console.log('Listening on Port 3000');
-});
-
-// This renders the home page
-app.get('/', (req, res) => {
-    res.render('pages/index');
-});
-
-// This renders our "Collection" page when we click the "Albums" link in the navbar
-app.get('/collection', async (req, res) => {
-    // Here we find all of our albums and store them in the "records" array
-    const records = await Record.find({});
-    // Here we find all of our artists and store them in the "artists" array
-    const artists = await Artist.find({});
-    // The "sort()" method allows us to put in a callback function
-    // as a parameter. The function we created accepts two parameters,
-    // "a", and "b". These will be two elements from the "records" array.
-    // The sort method will cycle through the array accepting two elements.
-    records.sort(function (a, b) {
-        // If b should come before a, returns a negative number. If a should
-        // come before b, returns a positive number, if both are equal, returns
-        // 0. This sorts the array "records" by rating.
-        return b.rating - a.rating;
-    });
-    // Here I'm sorting the artists in the array alphabetically by name
-    for (let i = 0; i < records.length - 1; i++) {
-        if (records[i].artistName == records[i + 1].artistName) {
-            if (records[i].albumName > records[i + 1].albumName) {
-                [records[i], records[i + 1]] = [records[i + 1], records[i]];
-            }
-        }
-    };
-    res.render('pages/collection', { records, artists })
-});
-
-// This renders our "artists.ejs" page when we click the "Artists" link in the navbar
-app.get('/artists', async (req, res) => {
-    // Here we find all of our artists and store them in the "artists" array
-    const artists = await Artist.find({});
-    // Here I'm sorting the "artists" array alphabetically by name
-    artists.sort((a, b) => a.name.localeCompare(b.name));
-    res.render('pages/artists', { artists })
-});
-
-// This renders our "Best Albums" page when we click the "Best Albums" link in the navbar
-app.get('/bestAlbums', async (req, res) => {
-    const records = await Record.find({});
-    const artists = await Artist.find({});
-    records.sort(function (a, b) {
-        return b.rating - a.rating;
-    });
-    // Here I'm sorting the artists in the array alphabetically by name
-    for (let i = 0; i < records.length - 1; i++) {
-        if (records[i].artistName == records[i + 1].artistName) {
-            if (records[i].albumName > records[i + 1].albumName) {
-                [records[i], records[i + 1]] = [records[i + 1], records[i]];
-            }
-        }
-    };
-    res.render('pages/bestAlbums', { records, artists })
-});
-
-// This renders the "updateCollection.ejs" form page when we click the "Add Album" link in the navbar
-app.get('/updateCollection', async (req, res) => {
-    const { id } = req.params;
-    const record = await Record.find(id);
-    res.render('pages/updateCollection', { record })
-});
-
-// This renders our "viewInfo.ejs" page based on which album name you click on
-app.get('/viewInfo/:id', async (req, res) => {
-    const { id } = req.params;
-    // Finding the record based on it's id
-    const record = await Record.findById(id);
-    // Finding all of our artists
-    const artists = await Artist.find({});
-    // Rendering our "viewInfo" page and passing our record and artists info to it
-    res.render('pages/viewInfo', { record, artists })
-});
-
-// This renders the "editInfo.ejs" page when you click the edit button on an 
-// album's "viewInfo.ejs" page
-app.get('/editInfo/:id', async (req, res) => {
-    const { id } = req.params;
-    const record = await Record.findById(id);
-    res.render('pages/editInfo', { record })
-});
-
-// This renders rgw "showArtist" page based on the name of the artist you clicked on
-app.get('/showArtist/:id', async (req, res) => {
-    const { id } = req.params;
-    // Here we're populating the albums array for the artist because
-    // until we do that it is just an array of album ids. Once we 
-    // pupulate it we can use all of the album information for each 
-    // album in our ejs page
-    const artist = await Artist.findById(id).populate('albums');
-    const records = await Record.find({});
-    // Sorting the artist's albums alphabetically
-    artist.albums.sort((a, b) => a.albumName.localeCompare(b.albumName));
-    res.render('pages/showArtist', { artist, records })
-});
-
-// PUT request to update an album's info
-app.put('/collection/:id', async (req, res) => {
-    const { id } = req.params;
-    // Finds the record by it's ID and updates it's info
-    await Record.findByIdAndUpdate(id, req.body, { runValidators: true, new: true });
-    // Brings us back to the "collection.ejs" page
-    res.redirect('/collection');
-});
-
-// This posts all of the info you input into the form on the "updateCollection.ejs" 
-// page and then dumps you out at the "collection.ejs" page
-app.post('/collection', async (req, res) => {
-    // req.body are all of the keys and values you just submitted in the form
-    const newRecord = new Record(req.body);
-    await newRecord.save();
-    // Boolean value we need for the if, then logic below
-    foundArtist = false;
-    // Finding all artists in our collection and creating the "artists"
-    // array with them
-    const artists = await Artist.find({});
-    // This for loop goes through the "artists" array looking for an
-    // artist with a name that matches the artist name for the album,
-    // if it finds a match, it adds the new album to the existing artist's 
-    // array of albums
-    for (let i = 0; i < artists.length; i++) {
-        if (artists[i].name === newRecord.artistName) {
-            artists[i].albums.push(newRecord);
-            console.log("Found matching artist");
-            await artists[i].save();
-            foundArtist = true;
-        }
-    };
-    // If the for loop above didn't find a match, this creates a new
-    // artist and adds the album to that artist's array of albums
-    if (foundArtist == false) {
-        // Creating a new artist based on what the user entered in the
-        // artistName field on the form
-        const newArtist = new Artist({
-            name: newRecord.artistName,
-            albums: []
-        });
-        newArtist.albums.push(newRecord);
-        // Saving the newly created artist in our "artists" collection in
-        // MongoDB
-        await newArtist.save();
-    };
-    // Brings us back to the "collection.ejs" page
-    res.redirect('collection/');
-});
-
-// DELETE request to delete an artist and all of their albums
-app.delete('/artists/:id', async (req, res) => {
-    const { id } = req.params;
-    const artist = await Artist.findById(id);
-    // Here we are checking whether or not the artist has any albums in
-    // the artist's "albums" array, and if so we delete them all
-    if (artist.albums.length) {
-        const res = await Record.deleteMany({ _id: { $in: artist.albums } });
-        console.log(res);
-    }
-    // Now we're deleting the artist
-    await Artist.findByIdAndDelete(id);
-    // Now we redirect to the "artists.ejs" page
-    res.redirect('/artists');
-});
-
-// DELETE request for a single album
-app.delete('/collection/:id', async (req, res) => {
-    const { id } = req.params;
-    // Here we await the deletion of the record
-    const deletedRecord = await Record.findByIdAndDelete(id);
-    const artists = await Artist.find({});
-    // This for loop goes through the "artists" array and removes the
-    // album we just deleted from that artist's list of albums.
-    for (let i = 0; i < artists.length; i++) {
-        if (artists[i].name === deletedRecord.artistName) {
-            artists[i].albums.remove(deletedRecord);
-            await artists[i].save();
-        }
-    };
-    // Now we redirect to the "All Albums and Ratings" page
-    res.redirect('/collection');
 });

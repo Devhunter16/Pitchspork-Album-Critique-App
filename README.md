@@ -3,7 +3,6 @@ Pitchspork album rating express app created using HTML, CSS, Javascript, Node.JS
 
 Functionality to be implemented:
 
-- Server-side form validation
 - Sort options on each page (sort by: highest rating, by artist, etc.)
 - Search bar functionality
 - User authentication

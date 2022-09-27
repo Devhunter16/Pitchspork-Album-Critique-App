@@ -1,0 +1,31 @@
+<% layout("partials/boilerplate") %>
+
+<body class="container">
+    <div class="container">
+        <div class="row">
+            <h2 class="ml-4 mb-3" style="color: #f3f4f2">Best Albums</h2>
+        </div>
+        <div class="row">
+            <ul class="ml-2" style="color: #f3f4f2">
+                <% for (let record of records) { %>
+                <% if (record.rating>= 8) { %>
+                <li>
+                    <a style="color: #f3f4f2" href="/viewInfo/<%= record._id %>">
+                        <%= record.albumName %>
+                    </a>
+                    by
+                    <% for (let i=0; i < artists.length; i++) { %>
+                    <% if (record.artistName==artists[i].name) { %>
+                    <a style="color: #f3f4f2" href="/showArtist/<%= artists[i]._id %>">
+                        <%= artists[i].name %>
+                    </a>
+                    <% } %>
+                    <% } %>
+                    : <%= record.rating %>/10
+                    <% } %>
+                    <% } %>
+                </li>
+            </ul>
+        </div>
+    </div>
+</body>

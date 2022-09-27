@@ -1,0 +1,20 @@
+<% layout("partials/boilerplate") %>
+
+<body class="container">
+    <div class="container">
+        <div class="row">
+            <h2 class="ml-4 mb-3" style="color: #f3f4f2">Artists</h2>
+        </div>
+        <div class="row">
+            <ul class="ml-2" style="color: #f3f4f2">
+                <% for (let artist of artists) { %>
+                <li>
+                    <a href="/showArtist/<%= artist._id %>" style="color: #f3f4f2">
+                        <%= artist.name %>
+                    </a>
+                </li>
+                <% } %>
+            </ul>
+        </div>
+    </div>
+</body>

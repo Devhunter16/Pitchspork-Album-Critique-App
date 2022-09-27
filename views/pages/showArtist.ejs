@@ -1,0 +1,39 @@
+<% layout("partials/boilerplate") %>
+
+<body class="container">
+    <div class="container">
+        <div class="row">
+            <h1 style="color: #f3f4f2" class="ml-4 mb-3">
+                <%= artist.name %>
+            </h1>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <h2 style="color: #f3f4f2" class="ml-4 mb-3">
+                Albums
+            </h2>
+        </div>
+    </div>
+    <div class="container ml-4" style="color: #f3f4f2">
+        <div class="row mb-3">
+            <ul>
+                <% for (let i=0; i < artist.albums.length; i++ ) { %>
+                <% for (let j=0; j < records.length; j++ ) { %>
+                <% if (records[j].albumName === artist.albums[i].albumName) { %>
+                <li>
+                    <a style="color: #f3f4f2"
+                        href="/viewInfo/<%= records[j]._id %>"><%= artist.albums[i].albumName %></a>
+                </li>
+                <% } %>
+                <% } %>
+                <% } %>
+            </ul>
+        </div>
+        <div class="row mb-3">
+            <form action='/artists/<%= artist._id %>?_method=DELETE' method="POST">
+                <button class="btn btn-outline-warning">Delete Artist</button>
+            </form>
+        </div>
+    </div>
+</body>
